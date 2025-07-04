@@ -1,0 +1,56 @@
+🧠 Develop the Next Killer App for Qubic Mass Adoption
+
+
+
+Welcome to the frontier of decentralized computing. This track challenges you to build a powerful proof-of-concept (PoC) or MVP that showcases the unique potential of the Qubic Network—a quorum-based smart contract platform designed for speed, scalability, and developer freedom.
+
+
+
+Whether you’re building cross-chain bridges, DeFi primitives, or AI tools, your project should demonstrate the real-world impact and adoption potential of Qubic’s C++-based smart contract architecture.
+
+
+📘 Participants should also review the official Qubic Hackathon documentation. With this and the other resources provided, you'll have everything you need to successfully build for the Qubic track.
+
+
+
+
+🔍 What We’re Looking For:
+
+
+
+Feel free to choose one of the following core challenges and build a functional PoC/MVP
+
+
+
+• Solana Bridge – Create a secure, decentralized bridge that allows assets or data to flow between Solana and Qubic.
+
+• Derivatives DEX – Build a decentralized exchange for trading derivatives—such as futures or options—natively on Qubic. AI-enhanced features are a plus.
+
+• EVM in Qubic –  Implement an Ethereum Virtual Machine (EVM) environment within Qubic to enable interoperability with existing dApps.
+
+• C++ Smart Contract Audit Tool – Develop an AI toolchain or analyzer that can help audit and verify smart contracts written in C++ on Qubic.
+
+
+
+🛠️ Tech Requirements:
+
+• All projects must be deployed on the Qubic Network.
+
+• Smart contracts must be written in C++.
+
+• You may use any supporting tools, libraries, or frameworks as long as the core logic lives and runs on Qubic.
+
+
+
+🧪 Judging Criteria
+Your project will be evaluated on the following:
+
+Desirability – Solves a real problem and drives ecosystem adoption
+Feasibility – Technically sound and realistically buildable
+Viability – Potential for growth, sustainability, or monetization
+Project Definition  – Clearly defined features and roadmap
+Technical Complexity – Demonstrates advanced or creative use of Qubic + C++
+Quality – Functional, secure, and aligned with the stated goals
+
+
+For technical support, visit the Qubic Discord server.
