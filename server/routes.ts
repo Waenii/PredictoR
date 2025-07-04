@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertBetSchema } from "@shared/schema";
 import { resolveEventWithAI } from "./services/ai";
+import { QubicIntegration } from "./qubic-integration";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get default user (for demo purposes)
