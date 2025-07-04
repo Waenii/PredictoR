@@ -53,8 +53,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Place a bet
   app.post("/api/bets", async (req, res) => {
     try {
+      console.log("Received bet data:", req.body);
       const betData = insertBetSchema.parse(req.body);
       const userId = 1; // Default user ID
+      const betAmount = betData.amount || 10; // Default to 10 if not provided
       
       // Check user balance
       const user = await storage.getUser(userId);
@@ -62,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.balance < betData.amount) {
+      if (user.balance < betAmount) {
         return res.status(400).json({ message: "Insufficient balance" });
       }
       
@@ -73,10 +75,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create the bet
-      const bet = await storage.createBet({ ...betData, userId });
+      const bet = await storage.createBet({ 
+        eventId: betData.eventId,
+        prediction: betData.prediction,
+        amount: betAmount
+      }, userId);
       
       // Deduct bet amount from user balance
-      await storage.updateUserBalance(userId, user.balance - betData.amount);
+      await storage.updateUserBalance(userId, user.balance - betAmount);
       
       // Trigger AI resolution (simulate delay)
       setTimeout(async () => {
@@ -107,9 +113,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }, 3000); // 3 second delay to simulate AI processing
       
       res.json({ success: true, bet });
-    } catch (error) {
-      if (error.name === "ZodError") {
-        return res.status(400).json({ message: "Invalid bet data" });
+    } catch (error: any) {
+      console.error("Bet placement error:", error);
+      if (error?.name === "ZodError") {
+        console.error("Validation errors:", error.errors);
+        return res.status(400).json({ 
+          message: "Invalid bet data",
+          errors: error.errors 
+        });
       }
       res.status(500).json({ message: "Failed to place bet" });
     }

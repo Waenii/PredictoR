@@ -48,11 +48,11 @@ The application follows a monorepo pattern with clear separation of concerns:
 1. User views active prediction events on the home page
 2. User selects a prediction (YES/NO) and places a bet
 3. System validates user balance and creates bet record
-4. AI automatically resolves events using OpenAI GPT-4o
+4. AI automatically resolves events using Groq's Llama3 model
 5. User balance updates based on bet outcomes
 
 ### AI Resolution System
-Events are automatically resolved using OpenAI's GPT-4o model, which:
+Events are automatically resolved using Groq's Llama3 model, which:
 - Analyzes event titles and descriptions
 - Provides YES/NO determinations with confidence scores
 - Returns reasoning for resolution decisions
@@ -60,8 +60,8 @@ Events are automatically resolved using OpenAI's GPT-4o model, which:
 ## External Dependencies
 
 ### Core Technologies
-- **Database**: PostgreSQL via Neon serverless database
-- **AI Service**: OpenAI API for event resolution
+- **Database**: PostgreSQL via Neon serverless database (using in-memory storage for demo)
+- **AI Service**: Groq API with Llama3 model for event resolution
 - **UI Components**: Extensive Radix UI component library
 - **Validation**: Zod for runtime type checking
 
@@ -79,8 +79,8 @@ Events are automatically resolved using OpenAI's GPT-4o model, which:
 - Single deployment artifact containing both frontend and backend
 
 ### Environment Configuration
-- Database connection via `DATABASE_URL` environment variable
-- OpenAI API key configuration for AI resolution features
+- Database connection via `DATABASE_URL` environment variable (using in-memory for demo)
+- Groq API key configuration for AI resolution features
 - Development vs production environment handling
 
 ### Development Workflow
@@ -90,7 +90,9 @@ Events are automatically resolved using OpenAI's GPT-4o model, which:
 - `npm run db:push` - Applies database schema changes
 
 ## Changelog
-- July 04, 2025. Initial setup
+- July 04, 2025: Initial setup and completed implementation
+- July 04, 2025: Successfully implemented complete betting platform with AI resolution using Groq API
+- July 04, 2025: Fixed bet placement validation and tested end-to-end betting flow
 
 ## User Preferences
 

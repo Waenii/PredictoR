@@ -14,7 +14,7 @@ export interface IStorage {
   resolveEvent(eventId: number, correctAnswer: string): Promise<Event | undefined>;
 
   // Bet methods
-  createBet(bet: InsertBet): Promise<Bet>;
+  createBet(bet: InsertBet, userId: number): Promise<Bet>;
   getUserBets(userId: number): Promise<Bet[]>;
   getEventBets(eventId: number): Promise<Bet[]>;
   updateBetResult(betId: number, isWon: boolean): Promise<Bet | undefined>;
@@ -162,11 +162,14 @@ export class MemStorage implements IStorage {
     return undefined;
   }
 
-  async createBet(insertBet: InsertBet): Promise<Bet> {
+  async createBet(insertBet: InsertBet, userId: number): Promise<Bet> {
     const id = this.currentBetId++;
     const bet: Bet = {
-      ...insertBet,
       id,
+      userId,
+      eventId: insertBet.eventId,
+      prediction: insertBet.prediction,
+      amount: insertBet.amount || 10,
       isWon: null,
       createdAt: new Date(),
     };

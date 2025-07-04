@@ -46,6 +46,7 @@ export const insertEventSchema = createInsertSchema(events).omit({
 
 export const insertBetSchema = createInsertSchema(bets).omit({
   id: true,
+  userId: true,
   isWon: true,
   createdAt: true,
 });
