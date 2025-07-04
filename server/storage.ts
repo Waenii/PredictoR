@@ -1,4 +1,6 @@
 import { users, events, bets, type User, type InsertUser, type Event, type InsertEvent, type Bet, type InsertBet } from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -20,180 +22,92 @@ export interface IStorage {
   updateBetResult(betId: number, isWon: boolean): Promise<Bet | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private events: Map<number, Event>;
-  private bets: Map<number, Bet>;
-  private currentUserId: number;
-  private currentEventId: number;
-  private currentBetId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.events = new Map();
-    this.bets = new Map();
-    this.currentUserId = 1;
-    this.currentEventId = 1;
-    this.currentBetId = 1;
-
-    // Initialize with default user and sample events
-    this.initializeData();
-  }
-
-  private initializeData() {
-    // Create default user
-    const defaultUser: User = {
-      id: this.currentUserId++,
-      username: "player1",
-      password: "password",
-      balance: 100,
-    };
-    this.users.set(defaultUser.id, defaultUser);
-
-    // Create sample events
-    const sampleEvents: Omit<Event, 'id'>[] = [
-      {
-        title: "Will France win the 2024 FIFA World Cup?",
-        description: "Predict whether France will be crowned champions in the upcoming tournament.",
-        category: "Sports",
-        isActive: true,
-        isResolved: false,
-        correctAnswer: null,
-        createdAt: new Date(),
-        endsAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-      },
-      {
-        title: "Will Bitcoin reach $100,000 by end of 2024?",
-        description: "Predict whether Bitcoin will hit the six-figure milestone this year.",
-        category: "Technology",
-        isActive: true,
-        isResolved: false,
-        correctAnswer: null,
-        createdAt: new Date(),
-        endsAt: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000), // 12 days from now
-      },
-      {
-        title: "Will there be a new US President in 2024?",
-        description: "Predict the outcome of the upcoming presidential election.",
-        category: "Politics",
-        isActive: true,
-        isResolved: false,
-        correctAnswer: null,
-        createdAt: new Date(),
-        endsAt: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000), // 8 days from now
-      },
-      {
-        title: "Will a Marvel movie win an Oscar in 2024?",
-        description: "Predict whether any Marvel Studios film will receive an Academy Award.",
-        category: "Entertainment",
-        isActive: true,
-        isResolved: false,
-        correctAnswer: null,
-        createdAt: new Date(),
-        endsAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
-      },
-    ];
-
-    sampleEvents.forEach(event => {
-      const newEvent: Event = { ...event, id: this.currentEventId++ };
-      this.events.set(newEvent.id, newEvent);
-    });
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id, balance: 100 };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async updateUserBalance(userId: number, newBalance: number): Promise<User | undefined> {
-    const user = this.users.get(userId);
-    if (user) {
-      const updatedUser = { ...user, balance: newBalance };
-      this.users.set(userId, updatedUser);
-      return updatedUser;
-    }
-    return undefined;
+    const [user] = await db
+      .update(users)
+      .set({ balance: newBalance })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
   }
 
   async getAllActiveEvents(): Promise<Event[]> {
-    return Array.from(this.events.values()).filter(event => event.isActive);
+    return await db.select().from(events).where(eq(events.isActive, true));
   }
 
   async getEvent(id: number): Promise<Event | undefined> {
-    return this.events.get(id);
+    const [event] = await db.select().from(events).where(eq(events.id, id));
+    return event || undefined;
   }
 
   async createEvent(insertEvent: InsertEvent): Promise<Event> {
-    const id = this.currentEventId++;
-    const event: Event = {
-      ...insertEvent,
-      id,
-      isActive: true,
-      isResolved: false,
-      correctAnswer: null,
-      createdAt: new Date(),
-    };
-    this.events.set(id, event);
+    const [event] = await db
+      .insert(events)
+      .values(insertEvent)
+      .returning();
     return event;
   }
 
   async resolveEvent(eventId: number, correctAnswer: string): Promise<Event | undefined> {
-    const event = this.events.get(eventId);
-    if (event) {
-      const updatedEvent = {
-        ...event,
-        isResolved: true,
-        isActive: false,
-        correctAnswer,
-      };
-      this.events.set(eventId, updatedEvent);
-      return updatedEvent;
-    }
-    return undefined;
+    const [event] = await db
+      .update(events)
+      .set({ 
+        isResolved: true, 
+        isActive: false, 
+        correctAnswer 
+      })
+      .where(eq(events.id, eventId))
+      .returning();
+    return event || undefined;
   }
 
   async createBet(insertBet: InsertBet, userId: number): Promise<Bet> {
-    const id = this.currentBetId++;
-    const bet: Bet = {
-      id,
-      userId,
-      eventId: insertBet.eventId,
-      prediction: insertBet.prediction,
-      amount: insertBet.amount || 10,
-      isWon: null,
-      createdAt: new Date(),
-    };
-    this.bets.set(id, bet);
+    const [bet] = await db
+      .insert(bets)
+      .values({
+        ...insertBet,
+        userId,
+        amount: insertBet.amount || 10
+      })
+      .returning();
     return bet;
   }
 
   async getUserBets(userId: number): Promise<Bet[]> {
-    return Array.from(this.bets.values()).filter(bet => bet.userId === userId);
+    return await db.select().from(bets).where(eq(bets.userId, userId));
   }
 
   async getEventBets(eventId: number): Promise<Bet[]> {
-    return Array.from(this.bets.values()).filter(bet => bet.eventId === eventId);
+    return await db.select().from(bets).where(eq(bets.eventId, eventId));
   }
 
   async updateBetResult(betId: number, isWon: boolean): Promise<Bet | undefined> {
-    const bet = this.bets.get(betId);
-    if (bet) {
-      const updatedBet = { ...bet, isWon };
-      this.bets.set(betId, updatedBet);
-      return updatedBet;
-    }
-    return undefined;
+    const [bet] = await db
+      .update(bets)
+      .set({ isWon })
+      .where(eq(bets.id, betId))
+      .returning();
+    return bet || undefined;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
