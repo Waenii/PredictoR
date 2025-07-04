@@ -33,7 +33,7 @@ The application follows a monorepo pattern with clear separation of concerns:
 
 ### Backend Architecture
 - **API Structure**: RESTful endpoints for users, events, and betting operations
-- **Storage Layer**: Abstract storage interface with PostgreSQL database implementation
+- **Storage Layer**: Abstract storage interface with in-memory implementation
 - **AI Service**: Groq API integration with Llama3 model for automated event resolution
 - **Development Setup**: Vite middleware for hot reloading during development
 
@@ -60,7 +60,7 @@ Events are automatically resolved using Groq's Llama3 model, which:
 ## External Dependencies
 
 ### Core Technologies
-- **Database**: PostgreSQL with Drizzle ORM for persistent data storage
+- **Database**: In-memory storage for fast prototyping
 - **AI Service**: Groq API with Llama3 model for event resolution
 - **UI Components**: Extensive Radix UI component library
 - **Validation**: Zod for runtime type checking
@@ -79,7 +79,7 @@ Events are automatically resolved using Groq's Llama3 model, which:
 - Single deployment artifact containing both frontend and backend
 
 ### Environment Configuration
-- Database connection via `DATABASE_URL` environment variable for PostgreSQL
+- In-memory storage for development and demo purposes
 - Groq API key configuration for AI resolution features
 - Development vs production environment handling
 
@@ -94,6 +94,7 @@ Events are automatically resolved using Groq's Llama3 model, which:
 - July 04, 2025: Successfully implemented complete betting platform with AI resolution using Groq API
 - July 04, 2025: Fixed bet placement validation and tested end-to-end betting flow
 - July 04, 2025: Migrated from in-memory storage to PostgreSQL database with persistent data storage
+- July 04, 2025: Reverted back to in-memory storage, updated events to be realistic for 2025, and reduced AI resolution delay
 
 ## User Preferences
 

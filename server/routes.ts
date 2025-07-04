@@ -110,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } catch (error) {
           console.error("Failed to resolve event:", error);
         }
-      }, 3000); // 3 second delay to simulate AI processing
+      }, 1000); // 1 second delay to simulate AI processing
       
       res.json({ success: true, bet });
     } catch (error: any) {
